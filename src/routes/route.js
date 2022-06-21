@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const userController= require("../controllers/userController")
+const authorController= require("../controller/authorController")
+const blogController= require("../controller/blogController")
 
 
-router.post("/users", userAuthController.createUser  )
-
+router.post("/users", authorController.createAuthor  )
+router.post("/blogs", blogController.createBlog  )
 module.exports = router;

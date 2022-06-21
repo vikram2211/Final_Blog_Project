@@ -10,14 +10,14 @@ const authorSchema = new mongoose.Schema( {
         required:true
     },
     title:{
-        type:string,
+        type:String,
         required:true,
         enum: ["Mr", "Mrs", "Miss"]
     },
     emailId: {
         type:String,
         required:true,
-        unique: true,
+        unique: true
 
     },
     password:{

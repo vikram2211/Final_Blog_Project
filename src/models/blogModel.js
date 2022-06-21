@@ -30,7 +30,7 @@ const blogSchema = new mongoose.Schema({
     publishedAt: String,
     isPublished: {
         type: Boolean,
-        default: false
+        default: true
     }
 }, { timestamps: true });
 

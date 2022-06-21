@@ -1,13 +1,11 @@
-
-
 const mongoose = require('mongoose');
 
 const authorSchema = new mongoose.Schema( {
-    firstName: {
+    fname: {
         type:String,
         required:true
     },
-    lastName: {
+    lname: {
         type:String,
         required:true
     },
@@ -22,21 +20,10 @@ const authorSchema = new mongoose.Schema( {
         unique: true,
 
     },
-    mobile: {
+    password:{
         type: String,
-
         required: true
     },
-    emailId: String,
-    password: String,
-    gender: {
-        type: String,
-        enum: ["male", "female", "other"]
-    },
-    password:{
-        required:true
-    },
-    age: Number,
 }, { timestamps: true });
 
 module.exports = mongoose.model('author', authorSchema)

@@ -5,11 +5,13 @@ const ObjectId = mongoose.Schema.Types.ObjectId
 const blogSchema = new mongoose.Schema({
     title: {
         type: String,
-        required: true
+        required: true,
+        minlength:6
     },
     body: {
         type: String,
-        required: true
+        required: true,
+        maxlength: 1000
     },
     authorId: {
         type: ObjectId,
@@ -30,7 +32,7 @@ const blogSchema = new mongoose.Schema({
     publishedAt: String,
     isPublished: {
         type: Boolean,
-        default: true
+        default: false
     }
 }, { timestamps: true });
 

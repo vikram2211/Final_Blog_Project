@@ -3,11 +3,15 @@ const mongoose = require('mongoose');
 const authorSchema = new mongoose.Schema({
     fname: {
         type: String,
-        required: true
+        required: true,
+        minlength: 2,
+        maxlength: 15
     },
     lname: {
         type: String,
-        required: true
+        required: true,
+        minlength: 2,
+        maxlength: 15
     },
     title: {
         type: String,
@@ -17,12 +21,13 @@ const authorSchema = new mongoose.Schema({
     emailId: {
         type: String,
         required: true,
-        unique: true
+        unique: true,      
 
     },
     password: {
         type: String,
-        required: true
+        required: true,
+        minlength: 3
     },
 }, { timestamps: true });
 

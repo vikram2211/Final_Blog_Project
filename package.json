@@ -13,6 +13,8 @@
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
     "mongoose": "^6.4.0",
-    "nodemon": "^2.0.16"
+    "nodemon": "^2.0.16",
+    "validate": "^5.2.0",
+    "validator": "^13.7.0"
   }
 }

@@ -5,7 +5,7 @@ const createBlog = async function (req, res) {
     try{
     let blog = req.body
     if(Object.keys(blog).length==0){
-        return res.status(400).send({status: true, msg: "Empty Body. Enter the fields."})
+        return res.status(400).send({status: false, msg: "Empty Body. Enter the fields."})
     }
     if( !(blog.title && blog.body && blog.authorId && blog.category) ){
         res.status(404).send({status : false, msg : "Please fill the Mandatory Fields."})
@@ -27,7 +27,7 @@ const getBlog = async (req, res) => {
     try{
     let data = req.query
     if(Object.keys(data).length==0){
-        return res.status(400).send({status: true, msg: "Empty Query. Enter the Queries."})
+        return res.status(400).send({status: false, msg: "Empty Query. Enter the Queries."})
     }
 
     if( !(data.category || data.title || data.subcategory || data.authorId) ){
@@ -49,7 +49,7 @@ const updatedBlog = async function (req, res) {
     let blogId = req.params.blogId
     let data = req.body
     if(Object.keys(data).length==0){
-        return res.status(400).send({status: true, msg: "Empty Body. Enter the fields."})
+        return res.status(400).send({status: false, msg: "Empty Body. Enter the fields."})
     }
     let title = req.body.title
     let body = req.body.body
@@ -88,7 +88,7 @@ const deleteBlogByFields = async (req, res) => {
   try {
     let {category, authorId, tags, subcategory} = req.query;
     if(Object.keys(req.query).length==0){
-      return res.status(400).send({status: true, msg: "Empty query. Enter the fields."})
+      return res.status(400).send({status: false, msg: "Empty query. Enter the fields."})
   }
   let blog = await blogModel.findOneAndUpdate(
       { $or: [{ authorId }, { category }, { tags }, {subcategory}] },

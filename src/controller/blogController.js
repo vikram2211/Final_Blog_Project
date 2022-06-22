@@ -65,7 +65,52 @@ const updatedBlog = async function (req, res) {
 
 }
 
+const deleteBlog = async (req, res) => {
+  try {
+    let blogId = req.params.blogId;
+    let blog = await blogModel.findOneAndUpdate(
+      { $and: [{ _id: blogId }, { isDeleted: false }] },
+      { $set: { isDeleted: true ,  deletedAt : moment().format(), isPublished : false} },
+      { new: true }
+    );
+    if (!blog) {
+      return res
+        .status(400)
+        .send({ status: false, msg: "Sorry no record Found !" });
+    }
+    res.status(200).send({ status: true, data: blog });
+  } catch (err) {
+    return res.status(500).send({ status: false, msg: err.message });
+  }
+};
+
+const deleteBlogByFields = async (req, res) => {
+  try {
+    let {category, authorId, tags, subcategory} = req.query;
+    // let regex = /^[A-Za-z. ]{2,20}$/;
+    if (!category.match(valid)) {
+      return res
+        .status(400)
+        .send({ status: false, msg: "Bhai Format achhe se daal" });
+    }
+    let blog = await blogModel.findOneAndUpdate(
+      { $or: [{ authorId : authorId }, { category : category }] },
+      { $set: { isDeleted: true, deletedAt : moment().format() , isPublished : false} },
+      { new: true }
+    )
+    if (!blog) {
+      res.status(404).send({ status: false, msg: "Sorry No Data Found !" });
+    }
+
+    return res.status(200).send({ status: true, data: blog });
+  } catch (err) {
+    return res.status(500).send({ status: false, msg: err.message });
+  }
+};
+
 
 module.exports.createBlog = createBlog
 module.exports.getBlog = getBlog
 module.exports.updatedBlog = updatedBlog
+module.exports.deleteBlog = deleteBlog
+module.exports.deleteBlogByFields = deleteBlogByFields

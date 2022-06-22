@@ -87,14 +87,11 @@ const deleteBlog = async (req, res) => {
 const deleteBlogByFields = async (req, res) => {
   try {
     let {category, authorId, tags, subcategory} = req.query;
-    // let regex = /^[A-Za-z. ]{2,20}$/;
-    if (!category.match(valid)) {
-      return res
-        .status(400)
-        .send({ status: false, msg: "Bhai Format achhe se daal" });
-    }
-    let blog = await blogModel.findOneAndUpdate(
-      { $or: [{ authorId : authorId }, { category : category }] },
+    if(Object.keys(req.query).length==0){
+      return res.status(400).send({status: true, msg: "Empty query. Enter the fields."})
+  }
+  let blog = await blogModel.findOneAndUpdate(
+      { $or: [{ authorId }, { category }, { tags }, {subcategory}] },
       { $set: { isDeleted: true, deletedAt : moment().format() , isPublished : false} },
       { new: true }
     )

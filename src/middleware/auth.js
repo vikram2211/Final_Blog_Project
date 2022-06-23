@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const blogModel = require('../models/blogModel.js')
 const moment = require('moment')
-// let decodedToken
+let decodedToken
 
 let Authenticate = function (req, res, next) {
     try {
@@ -36,14 +36,16 @@ let Authorization = async function (req, res, next) {
 
 
 let AuthorizationByQuery = async function (req, res, next) {
-    try {
         let validAuthor = decodedToken.userId
+    //-------------------------------------------//
+        req.userId = validAuthor
+    //-------------------------------------------//
         let author = await blogModel.find({ $or: [{ authorId: req.query.authorId }, { category: req.query.category }, { tags: req.query.tags }, { subcategory: req.query.subcategory }] }).select({ authorId: 1, _id: 0 })
         // console.log(author)
         let userId = author.map(function (ele) {
             return `${ele.authorId}`
         })
-
+ 
         let id = userId.map(ele => {
             if (ele == validAuthor) {
                 return true
@@ -56,9 +58,7 @@ let AuthorizationByQuery = async function (req, res, next) {
         } else {
             return res.status(403).send({ status: false, msg: "You Are not authorised!!!" })
         }
-    } catch (err) {
-        return res.status(500).send({ status: false, msg: err.message })
-    }
+   
 }
 
 module.exports.Authenticate = Authenticate

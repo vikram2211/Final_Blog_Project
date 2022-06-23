@@ -2,38 +2,43 @@ const blogModel = require("../models/blogModel")
 const authorModel = require("../models/authorModels")
 const moment = require('moment')
 
-let keyValid = function (value) {
-  if (typeof (value) == "undefined" || typeof (value) == null) { return false }
-  if (typeof (value) === "Number" && value.trim().length == 0) { return false }
+let valid = function (value) {
+  if (typeof value == "undefined" || typeof value == null|| typeof value === "number" || value.length == 0 )
+  { 
+      return false 
+  }
+  if( typeof value == "string" ){
+      return  true
+  }
   return true
 }
 
 const createBlog = async function (req, res) {
   try {
     let blog = req.body
-    if (!keyValid(blog.title)) {
-      console.log(blog.title)
-      return res.status(400).send({ status: false, message: "Please enter Title." })
-    }
-
-    // if (!keyValid(blog.body)){
-    //   return res.status(400).send({ status: false, message: "Please enter Body." })
-    // }
-    // if (!keyValid(blog.tags)){
-    //   return res.status(400).send({ status: false, message: "Please enter Tags." })
-    // }
-    // if (!keyValid(blog.category)){
-    //   return res.status(400).send({ status: false, message: "Please enter Category." })
-    // }
-    // if (!keyValid(blog.subcategory)){
-    //   return res.status(400).send({ status: false, message: "Please enter Subcategory." })
-    // }
-    if (Object.keys(blog).length == 0) {
-      return res.status(400).send({ status: false, msg: "Empty Body. Enter the fields." })
-    }
     if (!(blog.title && blog.body && blog.authorId && blog.category)) {
       return res.status(404).send({ status: false, msg: "Please fill the Mandatory Fields." })
     }
+    if (!valid(blog.title)) {
+      return res.status(400).send({ status: false, message: "Please enter Title." })
+    }
+
+    if (!valid(blog.body)){
+      return res.status(400).send({ status: false, message: "Please enter Body." })
+    }
+    if (!valid(blog.tags)){
+      return res.status(400).send({ status: false, message: "Please enter Tags." })
+    }
+    if (!valid(blog.category)){
+      return res.status(400).send({ status: false, message: "Please enter Category." })
+    }
+    if (!valid(blog.subcategory)){
+      return res.status(400).send({ status: false, message: "Please enter Subcategory." })
+    }
+    if (Object.keys(blog).length == 0) {
+      return res.status(400).send({ status: false, msg: "Empty Body. Enter the fields." })
+    }
+    
 
     let author = await authorModel.findById(blog.authorId)
     if (!author) {
@@ -109,38 +114,40 @@ const deleteBlog = async (req, res) => {
 };
 
 const deleteBlogByFields = async (req, res) => {
-  try {
     let { category, authorId, tags, subcategory } = req.query;
-
+    let validAuthor = req.userId
     //console.log(authorId)
     if (Object.keys(req.query).length == 0) {
       return res.status(400).send({ status: false, msg: "Empty query. Enter the fields." })
     }
     let data = await blogModel.find({isDeleted : false}, {isPublished : true}).select({_id:0, authorId:1, isPublished:0})
     let d = data.map(elem => console.log(elem))
+    //console.log(req.userId)
     //return res.send({msg : data})
 
 
     // {$and : [ {isDeleted : false},{isPublished : true}, {$or: [{ authorId }, { category }, { tags }, { subcategory }] }]}
 
+
+
+//------------------------------------------------------------//
     let blog = await blogModel.updateMany(
-      {authorId : data[0].authorId},
+      {authorId : validAuthor},
       { $set: { isDeleted: true, deletedAt: moment().format(), isPublished: false } },
       {new: true}
     )
+//------------------------------------------------------------------//
     
     //console.log(Object.keys(blog))
     
-     console.log(blog)
-     if (Object.keys(blog).length != 0) {
-         return res.status(200).send("Deleted Successfully");
-     }else{
-         return res.status(404).send({ status: false, msg: "No Data Found !!!" });
-     }
-    
-  } catch (err) {
-    return res.status(500).send({ status: false, msg: err.message });
-  }
+    //  console.log(blog)
+    //  if (Object.keys(blog).length != 0) {
+    //      return res.status(200).send("Deleted Successfully");
+    //  }else{
+    //      return res.status(404).send({ status: false, msg: "No Data Found !!!" });
+    //  }
+    console.log(validAuthor)
+    res.send("Deleted")
 };
 
 

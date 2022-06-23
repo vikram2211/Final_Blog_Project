@@ -5,28 +5,32 @@ const jwt = require('jsonwebtoken')
 let flag = false
 
 let valid = function (value) {
-    if (typeof (value) == "undefined" || typeof (value) == null|| typeof (value) == "Number" || value.length == 0 )
+    if (typeof value == "undefined" || typeof value == null|| typeof value === "number" || value.length == 0 )
     { 
         return false 
     }
-    if( typeof (value) == "String" ){
+    if( typeof value == "string" ){
         return  true
     }
+    return true
 }
 
 // let tokenObject = {}
 // let users
 // let userToken 
+// name = /^[A-Za-z]+$/
 
 const createAuthor = async function (req, res) {
     try{
-    let data = req.body
-    if(!valid(data.fName)) return res.status(400).send({ status: false, message: "Please enter first name" })
-    if (!valid(data.lName)) return res.status(400).send({ status: false, message: "Please enter last name" })
-    let email = req.body.emailId
+    let author = req.body
+    let d= valid(author.fname)
+    console.log(d)
     if( !(author.fname && author.lname && author.password && author.emailId) ){
-       return res.status(400).send({status : false, msg : "All fields are mandatory."})
-    }
+        return res.status(400).send({status : false, msg : "All fields are mandatory."})
+     }
+    if(!valid(author.fname)) return res.status(400).send({ status: false, message: "Please enter first name" })
+    if (!valid(author.lname)) return res.status(400).send({ status: false, message: "Please enter last name" })
+    let email = req.body.emailId
     let emailValidate = validator.isEmail(req.body.emailId);
     let duplicate = await authorModel.findOne({emailId : email})
     if(duplicate){

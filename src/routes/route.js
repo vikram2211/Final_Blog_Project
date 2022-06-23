@@ -11,7 +11,6 @@ router.get("/blogs", blogController.getBlog)
 router.put("/blogs/:blogId", auth.Authenticate, auth.Authorization, blogController.updatedBlog)
 router.delete('/blogs/:blogId', auth.Authenticate,auth.Authorization, blogController.deleteBlog)
 router.delete('/blogs', auth.Authenticate,auth.AuthorizationByQuery, blogController.deleteBlogByFields)
-// 
 
 router.post("/login", authorController.authorLogin)
 module.exports = router;

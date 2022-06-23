@@ -2,7 +2,6 @@ const authorModel = require("../models/authorModels")
 const validator = require('validator')
 const jwt = require('jsonwebtoken')
 
-let flag = false
 
 let valid = function (value) {
     if (typeof value == "undefined" || typeof value == null|| typeof value === "number" || value.length == 0 )
@@ -15,9 +14,7 @@ let valid = function (value) {
     return true
 }
 
-// let tokenObject = {}
-// let users
-// let userToken 
+
 // name = /^[A-Za-z]+$/
 
 const createAuthor = async function (req, res) {
@@ -69,14 +66,11 @@ const authorLogin = async function (req, res) {
 
       res.setHeader("x-api-key", token) 
       res.setHeader("authorId", user._id);
-      //res.redirect('../middleware/auth.js')
-      //tokenObject.token = token
       DataFromLogin = user._id;
       process.env.USER_ID = DataFromLogin;
      return res.status(200).send({ status: true, AuthorId : user._id , token: token });
   };
 
-// export DataFromLogin;
-//module.exports.DataFromLogin = DataFromLogin
-module.exports.authorLogin = authorLogin
+
 module.exports.createAuthor = createAuthor
+module.exports.authorLogin = authorLogin

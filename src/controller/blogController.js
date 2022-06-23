@@ -114,22 +114,11 @@ const deleteBlog = async (req, res) => {
 };
 
 const deleteBlogByFields = async (req, res) => {
-    let { category, authorId, tags, subcategory } = req.query;
+
     let validAuthor = req.userId
-    //console.log(authorId)
     if (Object.keys(req.query).length == 0) {
       return res.status(400).send({ status: false, msg: "Empty query. Enter the fields." })
     }
-    let data = await blogModel.find({isDeleted : false}, {isPublished : true}).select({_id:0, authorId:1, isPublished:0})
-    let d = data.map(elem => console.log(elem))
-    //console.log(req.userId)
-    //return res.send({msg : data})
-
-
-    // {$and : [ {isDeleted : false},{isPublished : true}, {$or: [{ authorId }, { category }, { tags }, { subcategory }] }]}
-
-
-
 //------------------------------------------------------------//
     let blog = await blogModel.updateMany(
       {authorId : validAuthor},
@@ -137,17 +126,9 @@ const deleteBlogByFields = async (req, res) => {
       {new: true}
     )
 //------------------------------------------------------------------//
-    
-    //console.log(Object.keys(blog))
-    
-    //  console.log(blog)
-    //  if (Object.keys(blog).length != 0) {
-    //      return res.status(200).send("Deleted Successfully");
-    //  }else{
-    //      return res.status(404).send({ status: false, msg: "No Data Found !!!" });
-    //  }
-    console.log(validAuthor)
-    res.send("Deleted")
+
+res.status(200).send()
+ 
 };
 
 

@@ -2,6 +2,8 @@ const blogModel = require("../models/blogModel")
 const authorModel = require("../models/authorModels")
 const moment = require('moment')
 
+
+//<-----------This is used for Field Validation-------------------->//
 let valid = function (value) {
   if (typeof value == "undefined" || typeof value == null|| typeof value === "number" || value.length == 0 )
   { 
@@ -12,6 +14,9 @@ let valid = function (value) {
   }
   return true
 }
+
+
+//<------------------This function is used for Creating a blog----------------->//
 
 const createBlog = async function (req, res) {
   try {
@@ -34,23 +39,22 @@ const createBlog = async function (req, res) {
     }
     if (!valid(blog.subcategory)){
       return res.status(400).send({ status: false, message: "Please enter Subcategory." })
-    }
-    if (Object.keys(blog).length == 0) {
-      return res.status(400).send({ status: false, msg: "Empty Body. Enter the fields." })
-    }
-    
+    }    
 
     let author = await authorModel.findById(blog.authorId)
     if (!author) {
       return res.status(404).send({ status: false, msg: "author not found." })
     }
     let blogCreated = await blogModel.create(blog)
-    res.status(201).send({ Data: blogCreated })
+     return res.status(201).send({ Data: blogCreated })
   } catch (err) {
-    res.status(500).send({ msg: err.message })
+      return res.status(500).send({ msg: err.message })
   }
 }
 
+module.exports.createBlog = createBlog
+
+//<---------------This function used for Fetching a Blog--------------->//
 
 const getBlog = async (req, res) => {
   try {
@@ -62,17 +66,20 @@ const getBlog = async (req, res) => {
     if (!(data.category || data.tags || data.subcategory || data.authorId)) {
       return res.status(404).send({ status: false, msg: "No Query Received." })
     }
-    let blog = await blogModel.find({ $and: [{ isDeleted: false }, { isPublished: true }, { $or: [{ authorId: data.authorId }, { category: data.category }, { tags: data.tags }, { subcategory: data.subcategory }] }] })
-    if (blog.length == 0) {
-      res.status(404).send({ status: false, msg: "No Blog Found." })
-    }
-    res.send({ status: true, msg: blog })
+    let author = req.passData
+    let blog = await blogModel.find({ $and: [{ isDeleted: false }, { isPublished: true }, { $or: [{ authorId: author.authorId }, { category: data.category }, { tags: data.tags }, { subcategory: data.subcategory }] }] })
+    return res.status(200).send({status : true, msg : blog})
   }
   catch (err) {
-    res.status(500).send({ status: false, msg: err.message })
+    return res.status(500).send({ status: false, msg: err.message })
   }
 }
 
+
+module.exports.getBlog = getBlog
+
+
+//<----------------This function is used for Updating a Blog---------->//
 
 const updatedBlog = async function (req, res) {
   let blogId = req.params.blogId
@@ -94,6 +101,11 @@ const updatedBlog = async function (req, res) {
 
 }
 
+module.exports.updatedBlog = updatedBlog
+
+
+//<----------This function is used for Deleting a blog by BlogId------------>//
+
 const deleteBlog = async (req, res) => {
   try {
     let blogId = req.params.blogId;
@@ -113,9 +125,15 @@ const deleteBlog = async (req, res) => {
   }
 };
 
-const deleteBlogByFields = async (req, res) => {
+module.exports.deleteBlog = deleteBlog
 
-    let validAuthor = req.userId
+
+//<------------This function is used for Deleting a Blog by Query Parameter----------->//
+
+
+
+const deleteBlogByFields = async (req, res) => {
+   let validAuthor = req.userId
     if (Object.keys(req.query).length == 0) {
       return res.status(400).send({ status: false, msg: "Empty query. Enter the fields." })
     }
@@ -126,14 +144,8 @@ const deleteBlogByFields = async (req, res) => {
       {new: true}
     )
 //------------------------------------------------------------------//
-
 res.status(200).send()
  
 };
 
-
-module.exports.createBlog = createBlog
-module.exports.getBlog = getBlog
-module.exports.updatedBlog = updatedBlog
-module.exports.deleteBlog = deleteBlog
 module.exports.deleteBlogByFields = deleteBlogByFields

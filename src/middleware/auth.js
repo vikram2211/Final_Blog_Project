@@ -3,6 +3,8 @@ const blogModel = require('../models/blogModel.js')
 
 let decodedToken
 
+//<-----------This function is used for Authenticate an Author------------->//
+
 let Authenticate = function (req, res, next) {
     try {
         let token = req.headers["x-api-key"];
@@ -11,12 +13,25 @@ let Authenticate = function (req, res, next) {
         decodedToken = jwt.verify(token, "room13");
         if (!decodedToken)
             return res.status(400).send({ status: false, msg: "token is invalid" });
+        if(req.body.authorId){
+            if(decodedToken.userId == req.body.authorId){
+                 return next()
+            }else{
+               return res.status(403).send("User Not Authorised!!!")
+            }
+        }
         next()
     }
     catch (err) {
         return res.status(500).send({ status: false, msg: err.message })
     }
 }
+
+module.exports.Authenticate = Authenticate
+
+
+
+//<-----------------This function is used Authorisation of an Author------------->//
 
 let Authorization = async function (req, res, next) {
     try {
@@ -34,6 +49,10 @@ let Authorization = async function (req, res, next) {
     }
 }
 
+module.exports.Authorization = Authorization
+
+
+//<------------This Function is used for Authorization using Query Parameter----------->/
 
 let AuthorizationByQuery = async function (req, res, next) {
         let validAuthor = decodedToken.userId
@@ -44,7 +63,6 @@ let AuthorizationByQuery = async function (req, res, next) {
         let userId = author.map(function (ele) {
             return `${ele.authorId}`
         })
- 
         let id = userId.map(ele => {
             if (ele == validAuthor) {
                 return true
@@ -53,6 +71,7 @@ let AuthorizationByQuery = async function (req, res, next) {
             }
         })
         if (id.includes(true)) {
+            req.passData = author
             next()
         } else {
             return res.status(403).send({ status: false, msg: "You Are not authorised!!!" })
@@ -60,8 +79,22 @@ let AuthorizationByQuery = async function (req, res, next) {
    
 }
 
-module.exports.Authenticate = Authenticate
-module.exports.Authorization = Authorization
 module.exports.AuthorizationByQuery = AuthorizationByQuery
+
+
+//<--------------This function is used for Checking Existing Blog-------------> 
+
+const blogQueryValid = async function (req, res, next){
+
+    let data = req.query
+    let blog = await blogModel.find({ $and: [{ isDeleted: false }, { isPublished: true }, { $or: [{ authorId: data.authorId }, { category: data.category }, { tags: data.tags }, { subcategory: data.subcategory }] }] })
+    if (blog.length == 0) {
+      return res.status(404).send({ status: false, msg: "No Blog Found." })
+    }
+    return next()
+
+}
+
+module.exports.blogQueryValid = blogQueryValid
 
 

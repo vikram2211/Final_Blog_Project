@@ -3,6 +3,9 @@ const validator = require('validator')
 const jwt = require('jsonwebtoken')
 
 
+
+//<-----------This is used for Field Validation-------------------->//
+
 let valid = function (value) {
     if (typeof value == "undefined" || typeof value == null|| typeof value === "number" || value.length == 0 )
     { 
@@ -16,6 +19,9 @@ let valid = function (value) {
 
 
 // name = /^[A-Za-z]+$/
+
+
+//<------------------This function is used for Creating an Author----------------->//
 
 const createAuthor = async function (req, res) {
     try{
@@ -43,8 +49,9 @@ const createAuthor = async function (req, res) {
     }
 }
 
+module.exports.createAuthor = createAuthor
 
-
+//<---------------This function is used for Logging an Author----------------->//
 const authorLogin = async function (req, res) {
     let userName = req.body.emailId;
     let Password = req.body.password;
@@ -71,6 +78,4 @@ const authorLogin = async function (req, res) {
      return res.status(200).send({ status: true, AuthorId : user._id , token: token });
   };
 
-
-module.exports.createAuthor = createAuthor
 module.exports.authorLogin = authorLogin

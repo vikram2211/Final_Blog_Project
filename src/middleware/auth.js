@@ -59,7 +59,8 @@ let AuthorizationByQuery = async function (req, res, next) {
     //-------------------------------------------//
         req.userId = validAuthor
     //-------------------------------------------//
-        let author = await blogModel.find({ $or: [{ authorId: req.query.authorId }, { category: req.query.category }, { tags: req.query.tags }, { subcategory: req.query.subcategory }] }).select({ authorId: 1, _id: 0 })
+    // console.log(validAuthor)
+        let author = await blogModel.find({ $or: [{ authorId: validAuthor }, { category: req.query.category }, { tags: req.query.tags }, { subcategory: req.query.subcategory }] }).select({ authorId: 1, _id: 0 })
         let userId = author.map(function (ele) {
             return `${ele.authorId}`
         })
@@ -70,6 +71,7 @@ let AuthorizationByQuery = async function (req, res, next) {
                 return false
             }
         })
+        // console.log(id)
         if (id.includes(true)) {
             req.passData = author
             next()

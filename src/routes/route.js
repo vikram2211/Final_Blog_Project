@@ -24,4 +24,10 @@ router.delete('/blogs', auth.Authenticate, auth.AuthorizationByQuery, blogContro
 router.post("/login", authorController.authorLogin)
 
 
+// router.route("/products")
+// .post("/blogs", auth.Authenticate,  blogController.createBlog)
+// .get("/blogs", auth.blogQueryValid, auth.Authenticate, auth.AuthorizationByQuery, blogController.getBlog)
+
+
+
 module.exports = router;

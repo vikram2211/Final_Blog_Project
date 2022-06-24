@@ -169,13 +169,13 @@ module.exports.deleteBlog = deleteBlog;
 const deleteBlogByFields = async (req, res) => {
   let validAuthor = req.userId;
   let addObj = {isDeleted : false}
-  let deletedObj = {isDeleted : true, isPublished : false};
+  let deletedObj = {isDeleted : true, isPublished : false };
   
   deletedObj.deletedAt = moment().format();
   
 
   const { authorId, tags, category, subcategory } = req.query;
-  let Objectid = mongoose.Schema.Types.ObjectId(authorId)
+  let Objectid = mongoose.Types.ObjectId(authorId)
   
   if (Object.keys(req.query).length == 0) {
     return res
@@ -207,32 +207,11 @@ const deleteBlogByFields = async (req, res) => {
     addObj.subcategory = subcategory
   }
 
-  let blog = await blog.find(addObj).updateMany({$set : deletedObj})
-  //------------------------------------------------------------//
-  console.log(validAuthor)
+  let blog = await blogModel.find(addObj).updateMany({$set : deletedObj})
 
 
-  return res.status(200).send("Bhai sab kuchh sahi hai...😂");
-  // let blog = await blogModel.updateMany(
-  //   {authorId : validAuthor},
-  //   { $set: { isDeleted: true, deletedAt: moment().format(), isPublished: false } },
-  //   {new: true}
-  // )
-  // if(validAuthor)
-  // {
-  //   addObj = {authorId : validAuthor, isDeleted : false, isPublished : true}
-  // if((addObj.tags = tags) || (addObj.subcategory = subcategory) || (addObj.category = category) || (addObj.authorId = validAuthor))
-  // {
-  //   let testing = await blogModel.find(addObj).updateMany({$set : deletedObj})
-  //   return res.status(200).send({msg : "FGJHDGJGDJHDHDHWDIHDWUIHFDIUHDWI"})
-  // }
+  return res.status(200).send();
 }
-  
-  // {$set :{ isDeleted: false, deletedAt: moment().format(), isPublished: false }},
-  // {new : true});
-
-  // console.log(testing)
-  //------------------------------------------------------------------//
   
 
 

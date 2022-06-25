@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const blogModel = require('../models/blogModel.js')
+const ObjectId = require('mongoose').Types.ObjectId
 
 let decodedToken
 
@@ -14,12 +15,16 @@ let Authenticate = function (req, res, next) {
         if (!decodedToken)
             return res.status(400).send({ status: false, msg: "token is invalid" });
         if(req.body.authorId){
+            let id = ObjectId.isValid(req.body.authorId)
+            if(!id) return res.status(400).send({status:false, msg: "Enter valid Author Id."})
             if(decodedToken.userId == req.body.authorId){
                  return next()
             }else{
-               return res.status(403).send("User Not Authorised!!!")
+               return res.status(403).send("Unauthorised!!!")
             }
         }
+        req.tokenId = decodedToken.userId
+        console.log(decodedToken.userId)
         next()
     }
     catch (err) {
@@ -59,11 +64,12 @@ let AuthorizationByQuery = async function (req, res, next) {
     //-------------------------------------------//
         req.userId = validAuthor
     //-------------------------------------------//
-    // console.log(validAuthor)
+     console.log(validAuthor)
         let author = await blogModel.find({ $or: [{ authorId: validAuthor }, { category: req.query.category }, { tags: req.query.tags }, { subcategory: req.query.subcategory }] }).select({ authorId: 1, _id: 0 })
         let userId = author.map(function (ele) {
             return `${ele.authorId}`
         })
+        //console.log(userId)
         let id = userId.map(ele => {
             if (ele == validAuthor) {
                 return true
@@ -71,9 +77,10 @@ let AuthorizationByQuery = async function (req, res, next) {
                 return false
             }
         })
-        // console.log(id)
+        //console.log(id)
         if (id.includes(true)) {
-            req.passData = author
+            req.passData = author[0].authorId.toString()
+            console.log(req.passData)
             next()
         } else {
             return res.status(403).send({ status: false, msg: "You Are not authorised!!!" })
@@ -87,8 +94,22 @@ module.exports.AuthorizationByQuery = AuthorizationByQuery
 //<--------------This function is used for Checking Existing Blog-------------> 
 
 const blogQueryValid = async function (req, res, next){
-
+    
+    //<---------Checking Query Parameter is Not Empty------->//
     let data = req.query
+    let token = req.tokenId
+    //console.log(req.query.authorId)
+    //console.log(data.authorId)
+    if (!(data.category || data.tags || data.subcategory || data.authorId)) {
+        return res.status(404).send({ status: false, msg: "No Query Received." });
+     }
+     if(req.query.authorId){
+     if(decodedToken != req.query.authorId){
+        return res.status(403).send({status: false, msg: "Unauthorised Author."})
+      }
+     }
+    
+    //<-------Checking Blog is Deleted or Not-------------->//
     let blog = await blogModel.find({ $and: [{ isDeleted: false }, { isPublished: true }, { $or: [{ authorId: data.authorId }, { category: data.category }, { tags: data.tags }, { subcategory: data.subcategory }] }] })
     if (blog.length == 0) {
       return res.status(404).send({ status: false, msg: "No Blog Found." })

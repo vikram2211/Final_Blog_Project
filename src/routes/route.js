@@ -5,20 +5,25 @@ const blogController = require("../controller/blogController")
 const auth= require("../middleware/auth.js")
 
 //<-------------This API used for Create Author---------------->//
-router.post("/authors", authorController.createAuthor) 
+router.post("/authors", authorController.createAuthor)
 
 //<--------------------This API used for Create Blogs-------------->//
 router.post("/blogs", auth.Authenticate,  blogController.createBlog)  
 
+
 //<----------------This API used for Fetch Blogs of Logged in Author----------->//
 router.get("/blogs", auth.blogQueryValid, auth.Authenticate, auth.AuthorizationByQuery, blogController.getBlog) 
+
+
 
 //<----------------This API used for Update Blogs of Logged in Author---------->//
 router.put("/blogs/:blogId", auth.Authenticate, auth.Authorization, blogController.updatedBlog)
 
-//<----------------This API used for Deleting Blogs of Logged in Author--------->//
-router.delete('/blogs/:blogId', auth.Authenticate,auth.Authorization, blogController.deleteBlog)
-router.delete('/blogs', auth.Authenticate, auth.AuthorizationByQuery, blogController.deleteBlogByFields)
+
+
+//<----------------These APIs used for Deleting Blogs of Logged in Author--------->//
+router.delete('/blogs/:blogId', auth.Authenticate,auth.Authorization, blogController.deleteBlog) 
+router.delete('/blogs',  auth.blogQueryValid, auth.Authenticate, auth.AuthorizationByQuery, blogController.deleteBlogByFields)
 
 //<--------------This API used for Log in Author------------------>//
 router.post("/login", authorController.authorLogin)

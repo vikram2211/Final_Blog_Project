@@ -23,7 +23,7 @@ router.put("/blogs/:blogId", auth.Authenticate, auth.Authorization, blogControll
 
 //<----------------These APIs used for Deleting Blogs of Logged in Author--------->//
 router.delete('/blogs/:blogId', auth.Authenticate,auth.Authorization, blogController.deleteBlog) 
-router.delete('/blogs',  auth.blogQueryValid, auth.Authenticate, auth.AuthorizationByQuery, blogController.deleteBlogByFields)
+router.delete('/blogs',  auth.Authenticate, auth.blogQueryValid, auth.AuthorizationByQuery, blogController.deleteBlogByFields)
 
 //<--------------This API used for Log in Author------------------>//
 router.post("/login", authorController.authorLogin)
@@ -34,5 +34,6 @@ router.post("/login", authorController.authorLogin)
 // .get("/blogs", auth.blogQueryValid, auth.Authenticate, auth.AuthorizationByQuery, blogController.getBlog)
 
 
+//pass= /\w*\s*|\W|\D/.test(data.password)
 
 module.exports = router;

@@ -97,14 +97,15 @@ const blogQueryValid = async function (req, res, next){
     
     //<---------Checking Query Parameter is Not Empty------->//
     let data = req.query
-    let token = req.tokenId
-    //console.log(req.query.authorId)
+    let validAuthor = decodedToken
+    console.log("DecodedToken",validAuthor.userId)
     //console.log(data.authorId)
     if (!(data.category || data.tags || data.subcategory || data.authorId)) {
         return res.status(404).send({ status: false, msg: "No Query Received." });
      }
+     //decodedToken = jwt.verify(token, "room13");
      if(req.query.authorId){
-     if(decodedToken != req.query.authorId){
+     if(decodedToken.userId != req.query.authorId){
         return res.status(403).send({status: false, msg: "Unauthorised Author."})
       }
      }

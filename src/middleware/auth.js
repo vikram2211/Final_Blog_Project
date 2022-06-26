@@ -138,13 +138,16 @@ const blogQueryValid = async function (req, res, next) {
 module.exports.blogQueryValid = blogQueryValid;
 
 const testing = async (req, res, next) => {
-  const {authorId, tags, category, subcategory} = req.query;
+  try{
+    const {authorId, tags, category, subcategory} = req.query;
   const blogId = req.params.blogId;
   const data = req.body;
   console.log(req.query)
 
   // <---------------------This Auth for Post Api----------------->//
-  if (req.query) {
+
+  
+  if (Object.keys(req.query)!=0) {
     try {
       let validAuthor = decodedToken.userId;
 
@@ -166,7 +169,7 @@ const testing = async (req, res, next) => {
         }
         else
         {
-          return res.status(400).send({status : false, msg : "bhai jab tu authorised nahi hai to q ungli kr rhe ho 😡"})
+          return res.status(403).send({status : false, msg : "Unauthorised!!1"})
         }
       }
       if(req.query.tags)
@@ -181,6 +184,7 @@ const testing = async (req, res, next) => {
       {
         findAuthorIdObj.subcategory = req.query.subcategory;
       }
+      console.log("Param")
       console.log(findAuthorIdObj)
       let fetchAuthorId = await blogModel.findOne(findAuthorIdObj).select({authorId : 1, _id  : 0})
       // console.log(fetchAuthorId.authorId)
@@ -208,68 +212,81 @@ const testing = async (req, res, next) => {
 
     }
   }
-  if (req.body || req.params) {
-    try {
-      let token = req.headers["x-api-key"];
-      if (!token) token = req.headers["X-Api-Key"];
-      if (!token)
-        return res
-          .status(400)
-          .send({ status: false, msg: "token must be present" });
-      decodedToken = jwt.verify(token, "room13");
-      if (!decodedToken)
-        return res.status(400).send({ status: false, msg: "token is invalid" });
-      if (req.body.authorId) {
-        let id = ObjectId.isValid(req.body.authorId);
-        if (!id)
+  if ((Object.keys(req.body)!=0) || (Object.keys(req.params)!=0)) {
+      try {
+        console.log("Param", req.params)
+        let token = req.headers["x-api-key"];
+        if (!token) token = req.headers["X-Api-Key"];
+        if (!token)
           return res
             .status(400)
-            .send({ status: false, msg: "Enter valid Author Id." });
-        if (decodedToken.userId == req.body.authorId) {
-          return next();
-        } else {
-          return res
-            .status(403)
-            .send({ status: false, msg: "Unauthorised!!!" });
+            .send({ status: false, msg: "token must be present" });
+        decodedToken = jwt.verify(token, "room13");
+        if (!decodedToken)
+          return res.status(400).send({ status: false, msg: "token is invalid" });
+        if (req.body.authorId) {
+          let id = ObjectId.isValid(req.body.authorId);
+          if (!id)
+            return res
+              .status(400)
+              .send({ status: false, msg: "Enter valid Author Id." });
+          if (decodedToken.userId == req.body.authorId) {
+            return next();
+          } else {
+            return res
+              .status(403)
+              .send({ status: false, msg: "Unauthorised!!!" });
+          }
         }
-      }
-      let validBlogId = ObjectId.isValid(req.params.blogId);
-      req.tokenId = decodedToken.userId;
-      let validAuthor = decodedToken.userId;
-      console.log(decodedToken.userId);
-      let idCheckObj = {};
-      if(req.params.blogId)
-      {
-        if(!validBlogId)
+        let validBlogId = ObjectId.isValid(req.params.blogId);
+        req.tokenId = decodedToken.userId;
+        let validAuthor = decodedToken.userId;
+        console.log(decodedToken.userId);
+        let idCheckObj = {};
+        if(req.params.blogId)
         {
-          return res.status(404).send({status : false, msg : "Invalid Id !!"});
+          if(!validBlogId)
+          {
+            return res.status(404).send({status : false, msg : "Invalid Id !!"});
+          }
+          else
+          {
+            idCheckObj.blogId = req.params.blogId;
+          }
         }
-        else
-        {
-          idCheckObj.blogId = req.params.blogId;
-        }
+        console.log(idCheckObj)
+        let userId = await blogModel
+        .findById(idCheckObj.blogId)
+        .select({ authorId: 1, _id: 0 });
+        if (!userId)
+        return res
+          .status(400)
+          .send({ status: false, msg: "Blog Does not Exist! from params" });
+        userId = userId.authorId.toString();
+        console.log(validAuthor);
+        if (validAuthor != userId) {
+        return res
+          .status(403)
+          .send({ status: false, msg: "User not Authorised !" });
       }
-      console.log(idCheckObj)
-      let userId = await blogModel
-      .findById(idCheckObj.blogId)
-      .select({ authorId: 1, _id: 0 });
-      if (!userId)
-      return res
-        .status(400)
-        .send({ status: false, msg: "Blog Does not Exist! from params" });
-      userId = userId.authorId.toString();
-      console.log(validAuthor);
-      if (validAuthor != userId) {
-      return res
-        .status(403)
-        .send({ status: false, msg: "User not Authorised !" });
-    }
-      next();
-    } catch (err) {
-      return res.status(500).send({ status: false, msg: err.message, data : "frm Auhtjorsisatudscjhds"});
-    }
-  }
+        next();
+       
+      } catch (err) {
+        return res.status(500).send({ status: false, msg: err.message, data : "frm Auhtjorsisatudscjhds"});
+      }
+    
  
+ 
+}
+else
+{
+  return res.status(404).send({status : false , msg : "NO input From middelware "})
+}
+  }
+  catch(err)
+  {
+    return res.status(500).send({status : false, msg : err.message})
+  }
 };
 
 module.exports.testing = testing;

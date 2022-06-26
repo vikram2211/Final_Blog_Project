@@ -185,7 +185,7 @@ const updatedBlog = async function (req, res) {
   }
 
   let blog = await blogModel.findOneAndUpdate(
-    { _id: obj.blogId },
+    { _id: obj.blogId, isDeleted: false },
     { $set: dataObj },
     { new: true }
   );
@@ -242,7 +242,7 @@ const deleteBlog = async (req, res) => {
   // }
 
   let blog = await blogModel.findOneAndUpdate(
-    { _id: obj.blogId },
+    { _id: obj.blogId, isDeleted: false },
     { $set: dataObj },
     { new: true }
   );
@@ -289,7 +289,7 @@ const deleteBlog = async (req, res) => {
         .status(400)
         .send({ status: false, msg: "Already Deleted !!!" });
     }
-    res.status(200).send({msg : "Bhai ye btao body q nhi send krni "});
+    res.status(200).send();
   } catch (err) {
     return res.status(500).send({ status: false, msg: err.message });
   }

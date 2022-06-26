@@ -1,7 +1,8 @@
 const blogModel = require("../models/blogModel");
 const authorModel = require("../models/authorModels");
 const moment = require("moment");
-const { default: mongoose } = require("mongoose");
+const mongoose = require("mongoose");
+const ObjectId = mongoose.Types.ObjectId;
 
 //<-----------This is used for Field Validation-------------------->//
 let valid = function (value) {
@@ -148,21 +149,44 @@ module.exports.getBlog = getBlog;
 //<----------------This function is used for Updating a Blog---------->//
 
 const updatedBlog = async function (req, res) {
-  let blogId = req.params.blogId;
+ try{
+  let blogId = ObjectId.isValid(req.params.blogId);
+  let obj = {};
+  if(req.params.blogId)
+  {
+    if(!blogId) return res.status(404).send({status : false, msg : "Invalid BlogId !!"});
+    else obj.blogId = req.params.blogId;
+  }
   let data = req.body;
-  if (Object.keys(data).length == 0) {
+  
+
+  if (!(data.title || data.body || data.tags || data.subcategory)) {
     return res
       .status(400)
-      .send({ status: false, msg: "Empty Body. Enter the fields." });
+      .send({ status: false, msg: "Mandetory fields are requird !!! " });
   }
-  let title = req.body.title;
-  let body = req.body.body;
-  let tags = req.body.tags;
-  let subcategory = req.body.subcategory;
+  const {body, title, tags, subcategory} = req.body;
+  const dataObj = {isPublished : true, publishedAt : moment().format()};
+  if(title)
+  {
+    dataObj.title = title;
+  }
+  if(body)
+  {
+    dataObj.body =body
+  }
+  if(tags)
+  {
+    dataObj.tags = tags   
+  }
+  if(subcategory)
+  {
+    dataObj.subcategory =subcategory
+  }
 
   let blog = await blogModel.findOneAndUpdate(
-    { _id: blogId },
-    { $set: { title, body, tags, subcategory } },
+    { _id: obj.blogId },
+    { $set: dataObj },
     { new: true }
   );
 
@@ -170,6 +194,11 @@ const updatedBlog = async function (req, res) {
     return res.status(404).send({ status: false, msg: "blog not found." });
   }
   return res.status(200).send({ status: true, data: blog });
+ }
+ catch(err)
+ {
+  return res.status(500).send({status : false, msg : err.message})
+ }
 };
 
 module.exports.updatedBlog = updatedBlog;
@@ -178,24 +207,89 @@ module.exports.updatedBlog = updatedBlog;
 
 const deleteBlog = async (req, res) => {
   try {
-    let blogId = req.params.blogId;
-    let blog = await blogModel.findOneAndUpdate(
-      { $and: [{ _id: blogId }, { isDeleted: false }] },
-      {
-        $set: {
-          isDeleted: true,
-          deletedAt: moment().format(),
-          isPublished: false,
-        },
-      },
-      { new: true }
-    );
+    let blogId = ObjectId.isValid(req.params.blogId);
+  let obj = {};
+  if(req.params.blogId)
+  {
+    if(!blogId) return res.status(404).send({status : false, msg : "Invalid BlogId !!"});
+    else obj.blogId = req.params.blogId;
+  }
+  // let data = req.body;
+  
+
+  // if (!(data.title || data.body || data.tags || data.subcategory)) {
+  //   return res
+  //     .status(400)
+  //     .send({ status: false, msg: "Mandetory fields are requird !!! " });
+  // }
+  // const {body, title, tags, subcategory} = req.body;
+  const dataObj = {isPublished : false, isDeleted:true,  deletedAt : moment().format()};
+  // if(title)
+  // {
+  //   dataObj.title = title;
+  // }
+  // if(body)
+  // {
+  //   dataObj.body =body
+  // }
+  // if(tags)
+  // {
+  //   dataObj.tags = tags   
+  // }
+  // if(subcategory)
+  // {
+  //   dataObj.subcategory =subcategory
+  // }
+
+  let blog = await blogModel.findOneAndUpdate(
+    { _id: obj.blogId },
+    { $set: dataObj },
+    { new: true }
+  );
+  //   let validBlogId = ObjectId.isValid(req.params.blogId);
+  //   let blogId = req.params.blogId;
+  //   let addObj = { isDeleted: false }
+  // let deletedObj = { isDeleted: true, isPublished: false };
+  // if(req.params.blogId)
+  // {
+  //   if(!blogId) return res.status(404).send({status : false, msg : "Invalid BlogId !!"});
+  //   else obj.blogId = req.params.blogId;
+  // }
+  //   // let blog = await blogModel.findOneAndUpdate(
+  //   //   { $and: [{ _id: blogId }, { isDeleted: false }] },
+  //   //   {
+  //   //     $set: {
+  //   //       isDeleted: true,
+  //   //       deletedAt: moment().format(),
+  //   //       isPublished: false,
+  //   //     },
+  //   //   },
+  //   //   { new: true }
+  //   // );
+  //   if (authorId) {
+  //     if (Objectid && authorId == validAuthor) {
+  //       addObj.authorId = authorId;
+  //     }
+  //     else if (!Objectid) {
+  //       return res.status(400).send({ status: false, msg: "Author is Not Valid !" })
+  //     }
+  //   }
+  //   if (tags) {
+  //     addObj.tags = tags;
+  //   }
+  //   if (category) {
+  //     addObj.category = category;
+  //   }
+  //   if (subcategory) {
+  //     addObj.subcategory = subcategory
+  //   }
+  //   let blog = await blogModel.find(addObj).updateMany({ $set: deletedObj })
     if (!blog) {
       return res
         .status(400)
-        .send({ status: false, msg: "Sorry no record Found !" });
+        .send({ status: false, msg: "Already Deleted !!!" });
     }
-    res.status(200).send();
+    res.status(200).send({msg : "Bhai ye btao body q nhi send krni "});
   } catch (err) {
     return res.status(500).send({ status: false, msg: err.message });
   }

@@ -45,6 +45,8 @@ const createAuthor = async function (req, res) {
     //<-------Validation of Title----------->//
     name = /^Mr|Mrs|Miss+$/.test(author.title)
     if(!name) return res.status(400).send({status : false, msg : "Please Use Valid Title."})
+
+    
     //<-------Validation of Email Id----------->//
     let email = req.body.emailId
     let emailValidate = validator.isEmail(email);

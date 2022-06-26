@@ -100,28 +100,26 @@ module.exports.createBlog = createBlog;
 
 //<---------------This function used for Fetching a Blog--------------->//
 
+
 const getBlog = async (req, res) => {
   try {
     
-    
+    let validAuthorId = req.userId;
+    let data = req.query
+
     let {authorId, tags, category, subcategory} = req.query;
     let Objectid = mongoose.Types.ObjectId(authorId)
-    // if (Object.keys(data).length == 0) {
-    //   return res
-    //     .status(400)
-    //     .send({ status: false, msg: "Empty Query. Enter the Queries." });
-    // }
-    console.log(authorId,"AuthorID")
+    
+    console.log(authorId,"AuthorID input")
     let addObj = { isDeleted: false , isPublished : true}
-
-    if (authorId) {
-      if (Objectid && authorId == validAuthor) {
-        addObj.authorId = authorId;
-      }
-      else if (!Objectid) {
+    addObj.authorId = validAuthorId;
+    console.log("object",addObj)
+    console.log("query id",data.authorId)
+    
+      if (!Objectid) {
         return res.status(400).send({ status: false, msg: "Author is Not Valid !" })
       }
-    }
+    
     
     if (tags) {
       addObj.tags = tags;
@@ -132,34 +130,14 @@ const getBlog = async (req, res) => {
     if (subcategory) {
       addObj.subcategory = subcategory
     }
-  
-   let blog = await blogModel.find(addObj)
-  
+    console.log("object",addObj)
+    console.log("query id",data.authorId)
+   console.log(validAuthorId)
+   let blog = await blogModel.find(addObj )
+   console.log("The Object",addObj)
+    //console.log(`Final Data ${blog}`)
    if(blog.length == 0) return res.status(404).send({status : false, msg: "Blog Not Found."})
-   return res.status(200).send({status: false, msg : blog})
-
-  //   let author = req.passData;
-  //  let validAuthor = req.userId
-  //  console.log("Author",author)
-  //  console.log("ValidAuthor",validAuthor)
-  //   if (data.authorId == validAuthor) {
-  //     let blog = await blogModel.find({
-  //       $and: [
-  //         { isDeleted: false },
-  //         { isPublished: true },
-  //         {
-  //           $or: [
-  //             { authorId: validAuthor },
-  //             { category: data.category },
-  //             { tags: data.tags },
-  //             { subcategory: data.subcategory },
-  //           ],
-  //         },
-  //       ],
-  //     });
-  //     return res.status(200).send({ status: true, msg: blog });
-    
-  //   } else { res.status(404).send({ status: false, msg: "There is no Such Blogs." }) }
+   return res.status(200).send({status: true, msg : blog})
   } catch (err) {
     return res.status(500).send({ status: false, msg: err.message });
   }

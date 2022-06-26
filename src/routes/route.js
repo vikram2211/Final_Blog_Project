@@ -12,8 +12,8 @@ router.post("/blogs", auth.Authenticate,  blogController.createBlog)
 
 
 //<----------------This API used for Fetch Blogs of Logged in Author----------->//
-router.get("/blogs", auth.blogQueryValid, auth.Authenticate, auth.AuthorizationByQuery, blogController.getBlog) 
-
+router.get("/blogs", auth.Authenticate,  auth.AuthorizationByQuery,  blogController.getBlog) 
+// auth.blogQueryValid,
 
 
 //<----------------This API used for Update Blogs of Logged in Author---------->//
@@ -27,6 +27,10 @@ router.delete('/blogs',  auth.Authenticate, auth.blogQueryValid, auth.Authorizat
 
 //<--------------This API used for Log in Author------------------>//
 router.post("/login", authorController.authorLogin)
+
+router.all('/*', async function(req, res){
+    res.status(404).send({status: false, msg: "Page Not Found!!!"})
+})
 
 
 // router.route("/products")

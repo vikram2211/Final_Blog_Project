@@ -20,7 +20,7 @@ let Authenticate = function (req, res, next) {
             if(decodedToken.userId == req.body.authorId){
                  return next()
             }else{
-               return res.status(403).send("Unauthorised!!!")
+               return res.status(403).send({status: false, msg: "Unauthorised!!!"})
             }
         }
         req.tokenId = decodedToken.userId
@@ -61,30 +61,23 @@ module.exports.Authorization = Authorization
 
 let AuthorizationByQuery = async function (req, res, next) {
         let validAuthor = decodedToken.userId
+
+        console.log(`Toekn Id from ${validAuthor}`)
     //-------------------------------------------//
         req.userId = validAuthor
     //-------------------------------------------//
-     console.log(validAuthor)
-        let author = await blogModel.find({ $or: [{ authorId: validAuthor }, { category: req.query.category }, { tags: req.query.tags }, { subcategory: req.query.subcategory }] }).select({ authorId: 1, _id: 0 })
-        let userId = author.map(function (ele) {
-            return `${ele.authorId}`
-        })
-        //console.log(userId)
-        let id = userId.map(ele => {
-            if (ele == validAuthor) {
-                return true
-            } else {
-                return false
-            }
-        })
-        //console.log(id)
-        if (id.includes(true)) {
-            req.passData = author[0].authorId.toString()
-            console.log(req.passData)
-            next()
-        } else {
-            return res.status(403).send({ status: false, msg: "You Are not authorised!!!" })
+   
+        if(req.query.authorId){
+        if(req.query.authorId == validAuthor)
+        {
+           req.userId = validAuthor;
+          return next()
         }
+        else{
+          return res.status(403).send({status : false, msg : " Sorry You are not Authorised !!"})
+        }
+      }
+      next()
    
 }
 

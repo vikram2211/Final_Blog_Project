@@ -18,8 +18,6 @@ let valid = function (value) {
 }
 
 
-// name = /^[A-Za-z]+$/
-
 
 //<------------------This function is used for Creating an Author----------------->//
 
@@ -70,7 +68,7 @@ module.exports.createAuthor = createAuthor
 const authorLogin = async function (req, res) {
     let userName = req.body.emailId;
     let Password = req.body.password;
-    console.log(userName,Password);
+
     let user = await authorModel.findOne({ emailId: userName, password: Password }).select({ _id:1});
     if (!user)
       return res.status(404).send({
@@ -88,8 +86,7 @@ const authorLogin = async function (req, res) {
 
       res.setHeader("x-api-key", token) 
       res.setHeader("authorId", user._id);
-      //DataFromLogin = user._id;
-      //process.env.USER_ID = DataFromLogin;
+
      return res.status(200).send({ status: true, AuthorId : user._id , token: token });
   };
 

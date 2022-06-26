@@ -138,11 +138,76 @@ const blogQueryValid = async function (req, res, next) {
 module.exports.blogQueryValid = blogQueryValid;
 
 const testing = async (req, res, next) => {
-  const { authorId, tags, category, subcategory } = req.query;
+  const {authorId, tags, category, subcategory} = req.query;
   const blogId = req.params.blogId;
   const data = req.body;
+  console.log(req.query)
 
   // <---------------------This Auth for Post Api----------------->//
+  if (req.query) {
+    try {
+      let validAuthor = decodedToken.userId;
+
+      console.log(`Toekn Id from ${validAuthor}`);
+      let validObjectId = ObjectId.isValid(req.query.authorId);
+      //-------------------------------------------//
+      req.userId = validAuthor;
+      //-------------------------------------------//
+      let findAuthorIdObj = {isDeleted : false};
+      if(req.query.authorId)
+      {
+        console.log(`AuthorID ${req.query.authorId}`)
+        if(validObjectId && req.query.authorId == validAuthor)
+        {
+          findAuthorIdObj.authorId = req.query.authorId;
+        }
+        else if(!validObjectId){
+          return res.status(404).send({status : false, msg : "Invalid Author ID !!! "})
+        }
+        else
+        {
+          return res.status(400).send({status : false, msg : "bhai jab tu authorised nahi hai to q ungli kr rhe ho 😡"})
+        }
+      }
+      if(req.query.tags)
+      {
+        findAuthorIdObj.tags = req.query.tags;
+      }
+      if(req.query.category)
+      {
+        findAuthorIdObj.category = req.query.category;
+      }
+      if(req.query.subcategory)
+      {
+        findAuthorIdObj.subcategory = req.query.subcategory;
+      }
+      console.log(findAuthorIdObj)
+      let fetchAuthorId = await blogModel.findOne(findAuthorIdObj).select({authorId : 1, _id  : 0})
+      // console.log(fetchAuthorId.authorId)
+      if(fetchAuthorId != null)
+      {
+        req.varifiedAuthor = fetchAuthorId.authorId;
+        return next();
+      }
+      return res.status(404).send({msg : "No Data Found !! "})
+
+      // if (req.query) {
+      //   if (validAuthor) {
+      //     // req.userId = validAuthor;
+      //     return next();
+      //   } else {
+      //     return res
+      //       .status(403)
+      //       .send({ status: false, msg: " Sorry You are not Authorised !!" });
+      //   }
+      // }
+     
+    } catch (err) {
+      console.log(err)
+      return res.status(500).send({ status: false, msg: err.message, text : "hcdbucdsuycguy" });
+
+    }
+  }
   if (req.body || req.params) {
     try {
       let token = req.headers["x-api-key"];
@@ -191,7 +256,7 @@ const testing = async (req, res, next) => {
       if (!userId)
       return res
         .status(400)
-        .send({ status: false, msg: "Blog Does not Exist!" });
+        .send({ status: false, msg: "Blog Does not Exist! from params" });
       userId = userId.authorId.toString();
       console.log(validAuthor);
       if (validAuthor != userId) {
@@ -204,35 +269,7 @@ const testing = async (req, res, next) => {
       return res.status(500).send({ status: false, msg: err.message, data : "frm Auhtjorsisatudscjhds"});
     }
   }
-  if (
-    req.query.authorId ||
-    req.query.tags ||
-    req.query.category ||
-    req.query.subcategory
-  ) {
-    try {
-      let validAuthor = decodedToken.userId;
-
-      console.log(`Toekn Id from ${validAuthor}`);
-      //-------------------------------------------//
-      req.userId = validAuthor;
-      //-------------------------------------------//
-
-      if (req.query.authorId) {
-        if (req.query.authorId == validAuthor) {
-          req.userId = validAuthor;
-          return next();
-        } else {
-          return res
-            .status(403)
-            .send({ status: false, msg: " Sorry You are not Authorised !!" });
-        }
-      }
-      next();
-    } catch (err) {
-      return res.status(500).send({ status: false, msg: err.message });
-    }
-  }
+ 
 };
 
 module.exports.testing = testing;

@@ -300,7 +300,9 @@ module.exports.deleteBlog = deleteBlog;
 //<------------This function is used for Deleting a Blog by Query Parameter----------->//
 
 const deleteBlogByFields = async (req, res) => {
-  let validAuthor = req.userId;
+  try{
+    // let validAuthor = req.userId;
+    let verifiedAuthorId = req.varifiedAuthor
   let addObj = { isDeleted: false }
   let deletedObj = { isDeleted: true, isPublished: false };
 
@@ -317,7 +319,7 @@ const deleteBlogByFields = async (req, res) => {
   }
 
   if (authorId) {
-    if (Objectid && authorId == validAuthor) {
+    if (Objectid && authorId == verifiedAuthorId) {
       addObj.authorId = authorId;
     }
     else if (!Objectid) {
@@ -338,6 +340,11 @@ const deleteBlogByFields = async (req, res) => {
 
 
   return res.status(200).send();
+  }
+  catch(err)
+  {
+    return res.status(500).send({status : false, msg : err.message})
+  }
 }
 
 

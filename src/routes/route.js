@@ -48,8 +48,8 @@ router.put("/blogs/:blogId", auth.Authenticate, auth.testing, blogController.upd
 
 //<----------------These APIs used for Deleting Blogs of Logged in Author--------->//
 router.delete('/blogs/:blogId', auth.Authenticate,auth.testing, blogController.deleteBlog) 
-router.delete('/blogs',  auth.Authenticate, auth.blogQueryValid, auth.testing, blogController.deleteBlogByFields)
-
+router.delete('/blogs',  auth.Authenticate,  auth.testing, blogController.deleteBlogByFields)
+// auth.blogQueryValid,
 
 router.all('/*', async function(req, res){
     res.status(404).send({status: false, msg: "Page Not Found!!!"})

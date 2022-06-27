@@ -212,7 +212,7 @@ const deleteBlogByFields = async (req, res) => {
     let Objectid = mongoose.Types.ObjectId(authorId)
 
     if (Object.keys(req.query).length == 0) 
-       return res.status(400).send({ status: false, msg: "Empty query. Enter the fields." });
+       return res.status(400).send({ status: false, msg: "Invalid Input!!!" });
 
     if (authorId) {
       if (Objectid && authorId == verifiedAuthorId) addObj.authorId = authorId;

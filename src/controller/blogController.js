@@ -28,7 +28,8 @@ const createBlog = async function (req, res) {
     //<-------Validation of Blog title----------->//
     if (!valid(blog.title))
       return res.status(400).send({ status: false, message: "Please enter Blog Title." });
-    let validating = /^[A-Za-z]+$/.test(blog.title.trim())
+    let validating = /^[A-Za-z0-9 ]{6,}$/.test(blog.title.trim())
+   // [A-Za-z]
     if (!validating) return res.send({ status: false, message: "Please enter Valid Blog Title." })
 
     //<-------Validation of Body of Blog----------->//

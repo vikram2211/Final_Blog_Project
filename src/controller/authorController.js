@@ -68,7 +68,9 @@ module.exports.createAuthor = createAuthor
 const authorLogin = async function (req, res) {
     let userName = req.body.emailId;
     let Password = req.body.password;
-
+    if( !(req.body.emailId && req.body.password ) ){
+      return res.status(400).send({status : false, msg : "All fields are mandatory."})
+   }
     let user = await authorModel.findOne({ emailId: userName, password: Password }).select({ _id:1});
     if (!user)
       return res.status(404).send({

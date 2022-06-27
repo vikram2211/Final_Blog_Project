@@ -87,7 +87,7 @@ const authorLogin = async function (req, res) {
       res.setHeader("x-api-key", token) 
       res.setHeader("authorId", user._id);
 
-     return res.status(200).send({ status: true, AuthorId : user._id , token: token });
+     return res.status(200).send({ status: true, data : {_id : user._id , token: token} });
   };
 
 module.exports.authorLogin = authorLogin

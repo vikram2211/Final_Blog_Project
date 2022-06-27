@@ -68,7 +68,7 @@ const createBlog = async function (req, res) {
 
     //<-------Blog Creation----------->//
     let blogCreated = await blogModel.create(blog);
-    return res.status(201).send({ Data: blogCreated });
+    return res.status(201).send({ status : true, data: blogCreated });
 
   } catch (err) {
     return res.status(500).send({ msg: err.message });
@@ -115,7 +115,7 @@ const getBlog = async (req, res) => {
     }
     let blog = await blogModel.find(addObj)
     if (blog.length == 0) return res.status(404).send({ status: false, msg: "Blog Not Found." })
-    return res.status(200).send({ status: true, msg: blog })
+    return res.status(200).send({ status: true, data: blog })
   } catch (err) {
     return res.status(500).send({ status: false, msg: err.message });
   }

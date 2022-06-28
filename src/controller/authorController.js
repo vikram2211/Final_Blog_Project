@@ -54,7 +54,7 @@ const createAuthor = async function (req, res) {
   
     //<-------Author Creation----------->//
     let authorCreated = await authorModel.create(author)
-    res.status(201).send({ status : true ,data: authorCreated })
+    res.status(201).send({ status : true , data: authorCreated })
 
     }catch(err){
         return res.status(500).send({ msg: err.message})
@@ -73,7 +73,7 @@ const authorLogin = async function (req, res) {
    }
     let user = await authorModel.findOne({ emailId: userName, password: Password }).select({ _id:1});
     if (!user)
-      return res.status(404).send({
+      return res.status(400).send({
         status: false,
         msg: "Email or the password is not corerct",
       });

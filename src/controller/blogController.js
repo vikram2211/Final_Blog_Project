@@ -23,19 +23,19 @@ const createBlog = async function (req, res) {
     let blog = req.body;
     if (!(blog.title && blog.body && blog.authorId && blog.category))
       return res.status(400).send({ status: false, msg: "Please fill the Mandatory Fields." });
-
+    let validating
 
     //<-------Validation of Blog title----------->//
     if (!valid(blog.title))
       return res.status(400).send({ status: false, message: "Please enter Blog Title." });
-    let validating = /^[A-Za-z0-9 ]{6,}$/.test(blog.title.trim())
+    //let validating = /^[A-Za-z]{6,}$/.test(blog.title.trim())
    // [A-Za-z]
-    if (!validating) return res.send({ status: false, message: "Please enter Valid Blog Title." })
+    //if (!validating) return res.send({ status: false, message: "Please enter Valid Blog Title." })
 
     //<-------Validation of Body of Blog----------->//
     if (!valid(blog.body))
       return res.status(400).send({ status: false, message: "Please enter Body of Blog." });
-    validating = /^[A-Za-z0-9]+$/.test(blog.body.trim())
+     validating = /^[A-Za-z0-9]+$/.test(blog.body.trim())
 
 
     //<-------Validation of Tags of Blog----------->//
@@ -139,24 +139,30 @@ const updatedBlog = async function (req, res) {
     if (!(data.title || data.body || data.tags || data.subcategory)) {
       return res
         .status(400)
-        .send({ status: false, msg: "Mandatory fields are requird !!! " });
+        .send({ status: false, message: "Mandatory fields are requird !!! " });
     }
-    const { body, title, tags, subcategory } = req.body;
-    const dataObj = { isPublished: true, publishedAt: moment().format() };
+    const { body, title, tags, subcategory , isPublished} = req.body;
+    const dataObj = { isPublised : isPublished, updatedAt: moment().format() };
     if (title) dataObj.title = title;
     if (body) dataObj.body = body
     if (tags) dataObj.tags = tags
     if (subcategory) dataObj.subcategory = subcategory
 
+    if(isPublished != undefined)
+    {
+      dataObj['isPublished']= isPublished;
+      dataObj['isPublished '] =  isPublished ? dataObj.publishedAt = moment().format() : dataObj.publishedAt = null;
+    }
+  
     let blog = await blogModel.findOneAndUpdate(
       { _id: obj.blogId, isDeleted: false },
-      { $set: dataObj },
+      { $set: dataObj ,  },
       { new: true }
     );
-
+    
     if (!blog) return res.status(404).send({ status: false, msg: "blog not found." });
 
-    return res.status(200).send({ status: true, data: blog });
+    return res.status(200).send({ status: true, message : "Updated Successfuly", data: blog });
   }
   catch (err) {
     return res.status(500).send({ status: false, msg: err.message })
@@ -187,7 +193,7 @@ const deleteBlog = async (req, res) => {
     );
     if (!blog) return res.status(404).send({ status: false, msg: "No Blog Found !!!" });
 
-    res.status(200).send();
+    res.status(200).send({status: true});
   }
   catch (err) {
     return res.status(500).send({ status: false, msg: err.message });
@@ -225,7 +231,7 @@ const deleteBlogByFields = async (req, res) => {
 
     let blog = await blogModel.find(addObj).updateMany({ $set: deletedObj })
 
-    return res.status(200).send();
+    return res.status(200).send({status : true});
 
   }
   catch (err) {
